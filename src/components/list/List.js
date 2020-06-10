@@ -1,61 +1,91 @@
-import {Lightning} from "wpe-lightning-sdk";
+import { Lightning } from 'wpe-lightning-sdk';
+import Item from '../item/Item';
 
 export default class List extends Lightning.Component {
     static _template() {
         return {
             Label: {
-                text: {text: '', fontFace: 'Magra'}
+                y: 30,
+                text: { text: '', fontFace: 'SourceSansPro-Regular' },
+                transitions: {
+                    alpha: { duration: 0.2 },
+                },
             },
             Movies: {
-                y: 75
-            }
-        }
+                y: 100,
+                transitions: {
+                    x: { duration: 0.1 },
+                },
+            },
+        };
     }
 
     _init() {
         this._index = 0;
+        this.assets = [];
     }
 
     _handleLeft() {
-        // @todo: update index and call setIndex
+        this.setIndex(this._index - 1);
     }
 
     _handleRight() {
-        // @todo: update index and call setIndex
+        this.setIndex(this._index + 1);
     }
 
     setIndex(index) {
-        /**
-         * @todo:
-         * Implement working setIndex method
-         * that stores index and position movie component to focus
-         * on selected item
-         */
+        let newIndex = index;
+
+        if (index < 0) {
+            newIndex = 0;
+        }
+
+        if (index > this.assets.length - 1) {
+            newIndex = this.assets.length - 1;
+        }
+
+        if (newIndex === this._index) {
+            return;
+        }
+
+        this._index = newIndex;
+        this.label = this.assets[newIndex].title || this.assets[newIndex].original_name;
+
+        this.tag('Movies').setSmooth('x', Math.max(-8 * 1.5 * 200, -newIndex * 200));
     }
 
-    set label(v) {
-        // @todo: update list title
+    set label(title) {
+        this.tag('Label').patch({
+            text: title,
+            alpha: 0.5,
+        });
+        this.tag('Label').setSmooth('alpha', 1);
     }
 
     set movies(v) {
-        // we add an array of object with type: Item
-        // this.tag("Levels").children = v.map((el, idx)=>{
-        //     return {
-        //         type: Item
-        //     };
-        // });
+        this.assets = v;
+        this.tag('Movies').children = this.assets.map((el, idx) => {
+            return {
+                type: Item,
+                item: el,
+                x: 200 * idx,
+            };
+        });
     }
 
     get items() {
-        return this.tag("Levels").children;
+        return this.tag('Movies').children;
     }
 
     get activeItem() {
-        // @todo: return selected item
+        return this.tag('Movies').children ? this.tag('Movies').children[this._index] : null;
+    }
+
+    _focus() {
+        this.label = this.assets[this._index].title;
     }
 
     _getFocused() {
-        // @todo:
-        // return activeItem
+        return this.activeItem;
     }
 }

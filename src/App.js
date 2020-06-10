@@ -1,16 +1,15 @@
 import { Lightning, Utils, Router } from 'wpe-lightning-sdk';
-import provider from "./lib/data-provider";
-import routes from "./lib/routes";
-import {init as initApi} from "./lib/Api"
-import {Splash} from "./pages";
+import provider from './lib/data-provider';
+import routes from './lib/routes';
+import { init as initApi } from './lib/Api';
+import { Splash } from './pages';
 
 export default class App extends Lightning.Component {
-
     static getFonts() {
         return [
-            {family: 'SourceSansPro-Regular', url: Utils.asset('fonts/SourceSansPro-Regular.ttf'), descriptors: {}},
-            {family: 'SourceSansPro-Black', url: Utils.asset('fonts/SourceSansPro-Black.ttf'), descriptors: {}},
-            {family: 'SourceSansPro-Bold', url: Utils.asset('fonts/SourceSansPro-Bold.ttf'), descriptors: {}}
+            { family: 'SourceSansPro-Regular', url: Utils.asset('fonts/SourceSansPro-Regular.ttf'), descriptors: {} },
+            { family: 'SourceSansPro-Black', url: Utils.asset('fonts/SourceSansPro-Black.ttf'), descriptors: {} },
+            { family: 'SourceSansPro-Bold', url: Utils.asset('fonts/SourceSansPro-Bold.ttf'), descriptors: {} },
         ];
     }
 
@@ -19,56 +18,51 @@ export default class App extends Lightning.Component {
     _setup() {
         initApi(this.stage);
         Router.startRouter({
-            appInstance: this, provider, routes
+            appInstance: this,
+            provider,
+            routes,
         });
+        Router.navigate('splash');
     }
 
     static _template() {
         return {
             Pages: {
-                forceZIndexContext: true, w: 1000
-            },
-            Splash:{
-               type: Splash
+                forceZIndexContext: true,
+                w: 1000,
             },
             Widgets: {
-                Menu:{
+                Menu: {
                     // @todo; this is an extra assignment,
                     // add Menu
-                }
+                },
             },
-            Loading: {
-
+            Loading: {},
+            Wrapper: {
+                Label: {
+                    text: {},
+                },
             },
-            Wrapper:{
-                Label:{
-                    text:{}
-                }
-            }
         };
     }
 
-    _handleEnter(){
-        // call
+    _getFocused() {
+        return this.tag('Splash');
     }
 
-    _getFocused(){
-        return this.tag("Splash")
-    }
-
-    _handleLeft(){
+    _handleLeft() {
         this.setIndex(this.index - 1);
     }
 
-     static _states() {
+    static _states() {
         return [
             class Loading extends this {
                 $enter() {
-                    this.tag("Loading").visible = true;
+                    this.tag('Loading').visible = true;
                 }
 
                 $exit() {
-                    this.tag("Loading").visible = false;
+                    this.tag('Loading').visible = false;
                 }
             },
             class Widgets extends this {
@@ -87,21 +81,20 @@ export default class App extends Lightning.Component {
                     // so it can consume remotecontrol presses
                     return this._widget;
                 }
-            }
+            },
         ];
     }
 
     // tell page router where to store the pages
     get pages() {
-        return this.tag("Pages");
+        return this.tag('Pages');
     }
 
-    get widgets(){
-        return this.tag("Widgets")
+    get widgets() {
+        return this.tag('Widgets');
     }
 
     _getFocused() {
         return Router.getActivePage();
     }
-
 }

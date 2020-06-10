@@ -1,37 +1,55 @@
-import {Lightning} from 'wpe-lightning-sdk';
-import {List} from "../components"
+import { Lightning, Utils } from 'wpe-lightning-sdk';
+import { List } from '../components';
 
-export default class Main extends Lightning.Component{
+export default class Main extends Lightning.Component {
     static _template() {
+        const timingFunction = 'cubic-bezier(0.20, 1.00, 0.80, 1.00)';
+
         return {
-            scale:0.5,
             Lists: {
-                x: 100, y: 560, zIndex: 3
+                x: 75,
+                y: 260,
+                zIndex: 3,
             },
-            // @todo: add logo
+            Logo: {
+                src: Utils.asset('images/logo.png'),
+                mount: 0.5,
+                x: 75 * 2,
+                y: -100,
+                alpha: 0.0001,
+                scale: 0.5,
+                transitions: {
+                    alpha: { duration: 1, timingFunction },
+                    y: { duration: 1, timingFunction },
+                },
+            },
         };
     }
 
     _init() {
-        this._index = 0; 
+        this._index = 0;
     }
 
-    _focus() {
-
+    _firstEnable() {
+        this.tag('Logo').on('txLoaded', () => {
+            this.patch({
+                Logo: { smooth: { alpha: 1, y: 75 } },
+            });
+        });
     }
 
-    /**
-     * @todo: add set movies() that will be called by the data-provider
-     * inside set movies create new List child and call it's movies setter
-     * and hand over the movies
-     */
+    set movies(movies) {
+        this.moviesList = new List(this.stage);
+        this.tag('Lists').childList.clear();
+        this.tag('Lists').childList.add(this.moviesList);
+        this.moviesList.movies = movies;
+    }
 
     _unfocus() {
         // @todo
     }
 
     _getFocused() {
-        // @todo: delegate focus to List child
+        return this.moviesList;
     }
-
 }

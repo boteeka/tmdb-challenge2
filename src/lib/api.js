@@ -1,26 +1,22 @@
 const apiKey = `66683917a94e703e14ca150023f4ea7c`;
 let stage;
 
-export const init = (stageInstance) =>{
+export const init = (stageInstance) => {
     stage = stageInstance;
 };
 
+const API_ENDPOINT = 'https://api.themoviedb.org/3/movie/popular';
 
-/**
- * @todo:
- * call get with the correct url
- * https://api.themoviedb.org/3/movie/popular
- * and return the data
- */
-export const getMovies = async()=> {
+export const getMovies = async () => {
+    const result = await get(`${API_ENDPOINT}?api_key=${apiKey}`);
 
+    return result.results;
 };
 
-const get = (url)=> {
+const get = (url) => {
     return fetch(url, {
-        'Accept': 'application/json'
-    }).then(response => {
+        Accept: 'application/json',
+    }).then((response) => {
         return response.json();
-    })
+    });
 };
-
